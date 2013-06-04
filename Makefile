@@ -1,4 +1,6 @@
 # Makefile for graph_test
+# Mitchell Brunton
+# June 2013
 
 all: graph_test
 

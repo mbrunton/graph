@@ -13,8 +13,11 @@ typedef struct edge_t {
 } edge_t;
 
 typedef struct {
-    int vert_num;
-    edge_t *edgelist;
+    edge_t *head;
+} edgelist_t;
+
+typedef struct {
+    edgelist_t edgelist;
 } vertex_t;
 
 typedef struct {
