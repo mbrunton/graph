@@ -10,13 +10,15 @@ int
 main(int argc, char **argv) {
     if (argc != 2) {
         fprintf(stderr, "usage: %s filename\n", argv[0]);
-        //fprintf(stderr, "filename has format:\nn\nu v w\n...\nu v w\n");
         exit(EXIT_FAILURE);
     }
 
     char *filename = argv[1];
     graph_t *G = read_graph(filename);
     print_graph(G);
+
+    dfs_struct *D = dfs(G);
+    print_dfs(D);
 
     return EXIT_SUCCESS;
 }

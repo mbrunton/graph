@@ -5,6 +5,13 @@
 
 #include <stdlib.h>
 
+#define DIRECTED 0
+#define MAX_LINE 80
+#define UNDEFINED -1
+#define TRUE (1==1)
+#define FALSE (1==0)
+
+// GRAPH TYPEDEFS
 typedef struct edge_t {
     int u;
     int v;
@@ -23,18 +30,32 @@ typedef struct {
 typedef struct {
     vertex_t *verts;
     int n;
+    int directed;
 } graph_t;
+
+
+// DFS TYPEDEFS
+typedef struct {
+    graph_t *T; // dfs tree (really a forest)
+    int *parents;
+    int *dfi_array;
+    int dfi_counter;
+    int k;  // number of components
+} dfs_struct;
+
 
 // INITIALISATIONS
 graph_t *read_graph(char *filename);
-graph_t *create_empty_graph(int n);
-void insert_edge(graph_t *G, int u, int v, int w);
+graph_t *create_empty_graph(int n, int directed);
+
+// PRINTING
 void print_graph(graph_t *G);
+void print_dfs(dfs_struct *D);
 
 
-// SEARCHING
-void dfs(graph_t *G);
-void bfs(graph_t *G);
+// SEARCHING    TODO pass function pointer to act on each explored node
+dfs_struct *dfs(graph_t *G);
+graph_t *bfs(graph_t *G);
 
 // DISTANCES
 int *dijkstra(graph_t *G);
