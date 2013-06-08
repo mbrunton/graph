@@ -2,8 +2,17 @@ Readme file for graph.h, graph.c
 Mitchell Brunton
 mmbrunton@gmail.com
 
+DISCLAIMER:
+This is my crude attempt to implement some common graph algorithms.
+I am very new to programming, and any comments/critiques will be welcome.
+I'm using this "project" to become more familiar with C and git and github.
 
-Format for graph file:
+HOW TO USE:
+To read in a graph, first convert it to the format described below, and save it
+as a text file. Then pass the filename to read_graph, which returns a pointer
+to a graph_t struct.
+
+GRAPH FILE FORMAT:
 n d     # n = number of vertices (>0), d = directed (1) or undirected (0)
 u v w   # u, v are adjacent vertices, 0 <= u,v < n, w = weight of edge (any int)
 u v w
