@@ -1,0 +1,14 @@
+Readme file for graph.h, graph.c
+Mitchell Brunton
+mmbrunton@gmail.com
+
+
+Format for graph file:
+n d     # n = number of vertices (>0), d = directed (1) or undirected (0)
+u v w   # u, v are adjacent vertices, 0 <= u,v < n, w = weight of edge (any int)
+u v w
+...
+u v w
+(EOF)
+
+

@@ -10,8 +10,8 @@
 
 // AUXILIARY FUNCTIONS
 void insert_edge(graph_t *G, int u, int v, int w);
-dfs_struct *create_empty_dfs_struct(int n);
-void explore(graph_t *G, dfs_struct *D, int u);
+search_tree *create_empty_search_tree(int n);
+void explore(graph_t *G, search_tree *D, int u);
 
 /* input file must have format:
 
@@ -85,11 +85,11 @@ create_empty_graph(int n, int directed) {
 
     G->n = n;
     G->directed = directed;
-    G->verts = (vertex_t *) malloc(sizeof(vertex_t) * n);
+    G->edgelists = (edgelist_t *) malloc(sizeof(edgelist_t) * n);
 
     int i;
     for (i=0; i<n; i++) {
-        G->verts[i].edgelist.head = NULL;
+        G->edgelists[i].head = NULL;
     }
 
     return G;
@@ -97,15 +97,15 @@ create_empty_graph(int n, int directed) {
 
 void
 insert_edge(graph_t *G, int u, int v, int w) {
-    edge_t *e = G->verts[u].edgelist.head;
+    edge_t *e = G->edgelists[u].head;
     
     if (NULL == e) {
         // first edge off this vertex
-        G->verts[u].edgelist.head = (edge_t *) malloc(sizeof(edge_t));
-        G->verts[u].edgelist.head->u = u;
-        G->verts[u].edgelist.head->v = v; 
-        G->verts[u].edgelist.head->w = w;
-        G->verts[u].edgelist.head->next = NULL;
+        G->edgelists[u].head = (edge_t *) malloc(sizeof(edge_t));
+        G->edgelists[u].head->u = u;
+        G->edgelists[u].head->v = v;
+        G->edgelists[u].head->w = w;
+        G->edgelists[u].head->next = NULL;
         return;
     }
 
@@ -123,13 +123,13 @@ insert_edge(graph_t *G, int u, int v, int w) {
 
 
 // returns graph of dfs tree
-dfs_struct *
+search_tree *
 dfs(graph_t *G) {
-    dfs_struct *D = create_empty_dfs_struct(G->n);
+    search_tree *D = create_empty_search_tree(G->n);
 
     int i;
     for (i = 0; i < G->n; i++) {
-        if (D->dfi_array[i] == UNDEFINED) {
+        if (D->arrival_times[i] == UNDEFINED) {
             explore(G, D, i);
             D->k++;
         }
@@ -139,17 +139,17 @@ dfs(graph_t *G) {
 }
 
 void
-explore(graph_t *G, dfs_struct *D, int u) {
+explore(graph_t *G, search_tree *D, int u) {
     // mark vertex u as visited
-    D->dfi_array[u] = D->dfi_counter;
-    D->dfi_counter++;
+    D->arrival_times[u] = D->arrival_counter;
+    D->arrival_counter++;
 
     // explore u's neighbors
     int v;
-    edge_t *e = G->verts[u].edgelist.head;
+    edge_t *e = G->edgelists[u].head;
     while (NULL != e) {
         v = e->v;
-        if (D->dfi_array[v] == UNDEFINED) {
+        if (D->arrival_times[v] == UNDEFINED) {
             // add edge e to our forest and start exploring v
             insert_edge(D->T, e->u, e->v, e->w);
             D->parents[v] = u;
@@ -160,23 +160,32 @@ explore(graph_t *G, dfs_struct *D, int u) {
     return;
 }
 
-dfs_struct *
-create_empty_dfs_struct(int n) {
-    dfs_struct *D = (dfs_struct *) malloc(sizeof(dfs_struct));
+search_tree *
+create_empty_search_tree(int n) {
+    search_tree *D = (search_tree *) malloc(sizeof(search_tree));
 
+    // TODO: tree should only have n vertices if underlying graph is connected
     D->T = create_empty_graph(n, FALSE);
     D->parents = (int *) malloc(sizeof(int) * n);
-    D->dfi_array = (int *) malloc(sizeof(int) * n);
-    D->dfi_counter = 0;
+    D->arrival_times = (int *) malloc(sizeof(int) * n);
+    D->arrival_counter = 0;
     D->k = 0;
 
     int i;
     for (i = 0; i < n; i++) {
         D->parents[i] = UNDEFINED;
-        D->dfi_array[i] = UNDEFINED;
+        D->arrival_times[i] = UNDEFINED;
     }
     return D;
 }
+
+search_tree *
+bfs(graph_t *G) {
+
+    return create_empty_search_tree(G->n);
+}
+
+
 
 void
 print_graph(graph_t *G) {
@@ -187,7 +196,7 @@ print_graph(graph_t *G) {
     for (i = 0; i < G->n; i++) {
         fprintf(stderr, "%d:  ", i);
 
-        e = G->verts[i].edgelist.head;
+        e = G->edgelists[i].head;
         while (NULL != e) {
             fprintf(stderr, "--(%d)--> %d,      ", e->w, e->v);
             e = e->next;
@@ -199,7 +208,7 @@ print_graph(graph_t *G) {
 }
 
 void
-print_dfs(dfs_struct *D) {
+print_dfs(search_tree *D) {
     int i;
     edge_t *e;
     fprintf(stderr, "DEPTH-FIRST SEARCH PRINTOUT:\n");
@@ -213,14 +222,14 @@ print_dfs(dfs_struct *D) {
         } else {
             fprintf(stderr, "parent = %d, ", D->parents[i]);
         }
-        fprintf(stderr, "dfi = %d\n", D->dfi_array[i]);
+        fprintf(stderr, "dfi = %d\n", D->arrival_times[i]);
     }
     fprintf(stderr, "\n");
 
     for (i = 0; i < D->T->n; i++) {
         fprintf(stderr, "%d: ", i);
 
-        e = D->T->verts[i].edgelist.head;
+        e = D->T->edgelists[i].head;
         while (NULL != e) {
             fprintf(stderr, "--(%d)--> %d,      ", e->w, e->v);
             e = e->next;

@@ -17,7 +17,7 @@ main(int argc, char **argv) {
     graph_t *G = read_graph(filename);
     print_graph(G);
 
-    dfs_struct *D = dfs(G);
+    search_tree *D = dfs(G);
     print_dfs(D);
 
     return EXIT_SUCCESS;
