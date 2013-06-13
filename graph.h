@@ -10,6 +10,8 @@
 #define UNDEFINED -1
 #define TRUE (1==1)
 #define FALSE (1==0)
+// TODO: find a better way of meta-branching
+#define REC_DFS 1   // 1/0 for recursive/iterative implementation of dfs
 
 // GRAPH TYPEDEFS
 typedef struct edge_t {
@@ -31,6 +33,7 @@ typedef struct {
 
 
 // DFS TYPEDEFS
+// TODO: backedges
 typedef struct {
     graph_t *T; // dfs tree
     int *parents;
@@ -47,7 +50,6 @@ graph_t *create_empty_graph(int n, int directed);
 // PRINTING
 void print_graph(graph_t *G);
 void print_dfs(search_tree *D);
-
 
 // SEARCHING    TODO pass function pointer to act on each visited node
 search_tree *dfs(graph_t *G);

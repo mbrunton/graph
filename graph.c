@@ -12,6 +12,8 @@
 void insert_edge(graph_t *G, int u, int v, int w);
 search_tree *create_empty_search_tree(int n);
 void explore(graph_t *G, search_tree *D, int u);
+search_tree *dfs_rec(graph_t *G);
+search_tree *dfs_iter(graph_t *G);
 
 /* input file must have format:
 
@@ -121,10 +123,19 @@ insert_edge(graph_t *G, int u, int v, int w) {
     return;
 }
 
-
 // returns graph of dfs tree
 search_tree *
 dfs(graph_t *G) {
+    if (REC_DFS == 1) {
+        return dfs_rec(G);
+    } else {
+        return dfs_iter(G);
+    }
+}
+
+/* recursive implementation of depth-first search */
+search_tree *
+dfs_rec(graph_t *G) {
     search_tree *D = create_empty_search_tree(G->n);
 
     int i;
@@ -144,7 +155,7 @@ explore(graph_t *G, search_tree *D, int u) {
     D->arrival_times[u] = D->arrival_counter;
     D->arrival_counter++;
 
-    // explore u's neighbors
+    // explore an unvisited neighbor (if exists)
     int v;
     edge_t *e = G->edgelists[u].head;
     while (NULL != e) {
@@ -158,6 +169,51 @@ explore(graph_t *G, search_tree *D, int u) {
         e = e->next;
     }
     return;
+}
+
+/* iterative implementation of depth-first search */
+search_tree *
+dfs_iter(graph_t *G) {
+
+    search_tree *D = create_empty_search_tree(G->n);
+    int u;  // u is active vertex
+    int v;      // v is a neighbor of u
+    edge_t *e;
+
+    // TODO: fix dfi bug
+    for (u = 0; u < G->n; u++) {
+        if (D->arrival_times[u] == UNDEFINED) {
+            D->k++;
+            while (TRUE) {
+                D->arrival_times[u] = D->arrival_counter;
+                D->arrival_counter++;
+
+                // explore first unvisited neighbor (if exists)
+                e = G->edgelists[u].head;
+                while (NULL != e) {
+                    v = e->v;
+                    if (D->arrival_times[v] == UNDEFINED) {
+                        insert_edge(D->T, e->u, e->v, e->w);
+                        D->parents[v] = u;
+                        u = v;
+                        break;
+                    }
+                    e = e->next;
+                }
+                
+                if (NULL == e) {
+                    // got to end of edgelist, all neighbors visited
+                    if (D->parents[u] != UNDEFINED) {
+                        u = D->parents[u];  // backtrack to parent of u
+                    } else {
+                        break;  // we're back at root
+                    }
+                }
+            }
+        }
+    }
+
+    return D;
 }
 
 search_tree *
@@ -181,6 +237,7 @@ create_empty_search_tree(int n) {
 
 search_tree *
 bfs(graph_t *G) {
+    search_tree *D = create_empty_search_tree(G->n);
 
     return create_empty_search_tree(G->n);
 }
