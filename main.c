@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "graph.h"
+#include "priority_queue.h"
 
 int
 main(int argc, char **argv) {
@@ -20,5 +21,18 @@ main(int argc, char **argv) {
     search_tree *D = dfs(G);
     print_dfs(D);
 
+    pq_t *Q = create_empty_pq(5);
+    int i;
+    for (i = 0; i < 5; i++) {
+        push(Q, (void *) NULL, 100 - i);
+        print_pq(Q);
+    }
+    for (i = 0; i < 5; i++) {
+        pop(Q);
+        print_pq(Q);
+    }
+
     return EXIT_SUCCESS;
 }
+
+

@@ -5,6 +5,7 @@
 
 #include <stdlib.h>
 
+#define INFINITY (1000*1000*1000)
 #define DIRECTED 0
 #define MAX_LINE 80
 #define UNDEFINED -1
@@ -56,7 +57,7 @@ search_tree *dfs(graph_t *G);
 search_tree *bfs(graph_t *G);
 
 // DISTANCES
-int *dijkstra(graph_t *G);
+int *dijkstra(graph_t *G, int s);
 int *bellman_ford(graph_t *G);
 
 // TREES

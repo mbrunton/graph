@@ -5,6 +5,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 #include "graph.h"
 
 
@@ -238,10 +239,29 @@ create_empty_search_tree(int n) {
 search_tree *
 bfs(graph_t *G) {
     search_tree *D = create_empty_search_tree(G->n);
+    pq_t *Q = create_empty_pq(G->n);
 
+    // TODO: is there a better way of passing vertices to Q?
+    // need array of vertices since queue wants pointers
+    int *vertices = malloc(sizeof(int) * G->n);
+    int i;
+    for (i = 0; i < G->n; i++) {
+        vertices[i] = i;
+    }
+
+    push(Q, &vertices[0], 0);
+    for (i = 1; i < G->n; i++) {
+        push(Q, &vertices[i], INFINITY);
+    }
+    
     return create_empty_search_tree(G->n);
 }
 
+int
+dijkstra(graph_t *G, int s) {
+    // TODO
+    return 0;
+}
 
 
 void
