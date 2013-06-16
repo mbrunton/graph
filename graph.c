@@ -12,12 +12,14 @@
 
 
 // AUXILIARY FUNCTIONS
+graph_t *create_empty_graph(int n, int directed);
 void insert_edge(graph_t *G, int u, int v, int w);
-search_tree *create_empty_search_tree(int n);
-void explore(graph_t *G, search_tree *D, int u);
-search_tree *dfs_rec(graph_t *G);
-search_tree *dfs_iter(graph_t *G);
+search_tree_t *create_empty_search_tree(int n);
+void explore(graph_t *G, search_tree_t *D, int u);
+search_tree_t *dfs_rec(graph_t *G);
+search_tree_t *dfs_iter(graph_t *G);
 int *get_vertex_array(int n);
+dist_tree_t *create_empty_dist_tree(int n, int s);
 
 /* input file must have format:
 
@@ -128,7 +130,7 @@ insert_edge(graph_t *G, int u, int v, int w) {
 }
 
 // returns graph of dfs tree
-search_tree *
+search_tree_t *
 dfs(graph_t *G) {
     if (REC_DFS == 1) {
         return dfs_rec(G);
@@ -138,9 +140,9 @@ dfs(graph_t *G) {
 }
 
 /* recursive implementation of depth-first search */
-search_tree *
+search_tree_t *
 dfs_rec(graph_t *G) {
-    search_tree *D = create_empty_search_tree(G->n);
+    search_tree_t *D = create_empty_search_tree(G->n);
 
     int i;
     for (i = 0; i < G->n; i++) {
@@ -154,7 +156,7 @@ dfs_rec(graph_t *G) {
 }
 
 void
-explore(graph_t *G, search_tree *D, int u) {
+explore(graph_t *G, search_tree_t *D, int u) {
     // mark vertex u as visited
     D->arrival_times[u] = D->arrival_counter;
     D->arrival_counter++;
@@ -176,10 +178,10 @@ explore(graph_t *G, search_tree *D, int u) {
 }
 
 /* iterative implementation of depth-first search */
-search_tree *
+search_tree_t *
 dfs_iter(graph_t *G) {
 
-    search_tree *D = create_empty_search_tree(G->n);
+    search_tree_t *D = create_empty_search_tree(G->n);
     int u;  // u is active vertex
     int v;      // v is a neighbor of u
     edge_t *e;
@@ -220,12 +222,12 @@ dfs_iter(graph_t *G) {
     return D;
 }
 
-search_tree *
+search_tree_t *
 create_empty_search_tree(int n) {
-    search_tree *D = (search_tree *) malloc(sizeof(search_tree));
+    search_tree_t *D = (search_tree_t *) malloc(sizeof(search_tree_t));
 
     // TODO: tree should only have n vertices if underlying graph is connected
-    D->T = create_empty_graph(n, FALSE);
+    D->T = create_empty_graph(n, FALSE); // TODO: directed or undirected?
     D->parents = (int *) malloc(sizeof(int) * n);
     D->arrival_times = (int *) malloc(sizeof(int) * n);
     D->arrival_counter = 0;
@@ -239,10 +241,9 @@ create_empty_search_tree(int n) {
     return D;
 }
 
-// TODO
-search_tree *
+search_tree_t *
 bfs(graph_t *G) {
-    search_tree *D = create_empty_search_tree(G->n);
+    search_tree_t *D = create_empty_search_tree(G->n);
     queue_t *Q = create_empty_queue();
 
     // create array of vertex ints since queue stores (void *) pointers
@@ -298,26 +299,81 @@ get_vertex_array(int n) {
     return vertices;
 }
 
-// TODO
-int *
+// TODO: fix bugs
+dist_tree_t *
 dijkstra(graph_t *G, int s) {
-    pq_t *Q = create_empty_pq(G->n);
 
-    // TODO: is there a better way of passing vertices to Q?
-    // need array of vertices since queue wants pointers
-    int *vertices = malloc(sizeof(int) * G->n);
+    pq_t *pq = create_empty_pq(G->n);
+    int *vertices = get_vertex_array(G->n);
+    dist_tree_t *D = create_empty_dist_tree(G->n, s);
+
+    // store all vertices in priority queue
     int i;
     for (i = 0; i < G->n; i++) {
-        vertices[i] = i;
+        pq_push(pq, &vertices[i], D->dists[i]);
     }
 
-    pq_push(Q, &vertices[0], 0);
-    for (i = 1; i < G->n; i++) {
-        pq_push(Q, &vertices[i], INFINITY);
+    int u;  // active vertex
+    int v;  // neighboring vertex
+    int d;   // final distance of active vertex
+    edge_t *e;
+    while (pq_not_empty(pq)) {
+        // pop top vertex and record final distance
+        d = pq_peek_priority(pq);
+        u = *( (int *) pq_pop(pq) );
+        D->dists[u] = d;
+
+        // go through neighbors and see if route through u is quicker than current estimate
+        e = G->edgelists[u].head;
+        while (NULL != e) {
+            if (e->w < 0) {
+                fprintf(stderr, "Error: dijkstra's algorithm cannot ");
+                fprintf(stderr, "be applied to negatively weighted graphs\n");
+                exit(EXIT_FAILURE);
+            }
+            v = e->v;
+            if (d + e->w < D->dists[v]) {
+                D->dists[v] = d + e->w;
+                D->parents[v] = u;
+                update_priority(pq, &vertices[v], D->dists[v]);
+            }
+            e = e->next;
+        }
+        
     }
-    return 0;
+
+    return D;
 }
 
+dist_tree_t *
+create_empty_dist_tree(int n, int s) {
+    dist_tree_t *D = (dist_tree_t *) malloc(sizeof(dist_tree_t));
+    if (NULL == D) {
+        fprintf(stderr, "Error: malloc failed\n");
+        exit(EXIT_FAILURE);
+    }
+
+    D->s = s;
+    D->n = n;
+    D->dists = (int *) malloc(sizeof(int) * n);
+    D->parents = (int *) malloc(sizeof(int) * n);
+    if (NULL == D->dists || NULL == D->parents) {
+        fprintf(stderr, "Error: malloc failed\n");
+        exit(EXIT_FAILURE);
+    }
+
+    int i;
+    for (i = 0; i < n; i++) {
+        if (i == s) {
+            D->dists[i] = 0;
+        } else {
+            D->dists[i] = INFINITY;
+        }
+        D->parents[i] = UNDEFINED;
+    }
+
+    return D;
+}
 
 void
 print_graph(graph_t *G) {
@@ -346,7 +402,7 @@ print_graph(graph_t *G) {
 }
 
 void
-print_search_tree(search_tree *D) {
+print_search_tree(search_tree_t *D) {
     int i;
     edge_t *e;
     fprintf(stderr, "SEARCH PRINTOUT:\n");
@@ -374,12 +430,20 @@ print_search_tree(search_tree *D) {
         }
         fprintf(stderr, "\n");
     }
-
     fprintf(stderr, "\n");
-    return;
 }
 
+void
+print_dist_tree(dist_tree_t *D) {
+    fprintf(stderr, "DISTANCE PRINTOUT:\n");
+    fprintf(stderr, "source node = %d\n", D->s);
 
+    int i;
+    for (i = 0; i < D->n; i++) {
+        fprintf(stderr, "dist[%d] = %d\n", i, D->dists[i]);
+    }
+    fprintf(stderr, "\n");
+}
 
 
 

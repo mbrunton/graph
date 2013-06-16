@@ -30,4 +30,6 @@ void pq_push(pq_t *Q, void *data, int priority);
 void update_priority(pq_t *Q, void *data, int priority);
 void *pq_pop(pq_t *Q);
 void *pq_peek(pq_t *Q);
+int pq_peek_priority(pq_t *Q);
+int pq_not_empty(pq_t *Q);
 void print_pq(pq_t *Q);

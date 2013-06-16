@@ -33,7 +33,7 @@ typedef struct {
 } graph_t;
 
 
-// DFS TYPEDEFS
+// SEARCH TYPEDEFS
 // TODO: backedges
 typedef struct {
     graph_t *T; // dfs tree
@@ -41,23 +41,31 @@ typedef struct {
     int *arrival_times;
     int arrival_counter;
     int k;  // number of components
-} search_tree;
+} search_tree_t;
 
+typedef struct {
+    int s;  // source
+    int n;  // order of graph
+    int *dists;
+    int *parents;
+} dist_tree_t;
 
 // INITIALISATIONS
 graph_t *read_graph(char *filename);
-graph_t *create_empty_graph(int n, int directed);
 
 // PRINTING
 void print_graph(graph_t *G);
-void print_search_tree(search_tree *D);
+void print_search_tree(search_tree_t *D);
+void print_dist_tree(dist_tree_t *D);
 
-// SEARCHING    TODO pass function pointer to act on each visited node
-search_tree *dfs(graph_t *G);
-search_tree *bfs(graph_t *G);
+// SEARCHING    
+// TODO: pass function pointer to act on each visited node
+// TODO: have source node option as well
+search_tree_t *dfs(graph_t *G);
+search_tree_t *bfs(graph_t *G);
 
 // DISTANCES
-int *dijkstra(graph_t *G, int s);
+dist_tree_t *dijkstra(graph_t *G, int s);
 int *bellman_ford(graph_t *G);
 
 // TREES

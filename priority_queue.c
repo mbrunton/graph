@@ -46,6 +46,7 @@ pq_push(pq_t *Q, void *data, int priority) {
     }
 }
 
+// TODO: make sure only distinct items?
 void
 update_priority(pq_t *Q, void *data, int priority) {
     int i;
@@ -126,6 +127,7 @@ pq_pop(pq_t *Q) {
     return top;
 }
 
+/* get data item with lowest priority without removing from priority queue */
 void *
 pq_peek(pq_t *Q) {
     if (Q->size <= 0) {
@@ -135,6 +137,24 @@ pq_peek(pq_t *Q) {
     }
 
     return Q->entries[0].data;
+}
+
+/* get priority of item at top of priority queue */
+int
+pq_peek_priority(pq_t *Q) {
+    if (Q->size <= 0) {
+        fprintf(stderr, "Error: priority queue is empty\n");
+        fprintf(stderr, "file: %s\tline:%d\n", __FILE__, __LINE__);
+        exit(EXIT_FAILURE);
+    }
+
+    return Q->entries[0].p;
+}
+
+/* return true if priority queue has >= 1 item */
+int
+pq_not_empty(pq_t *Q) {
+    return Q->size != 0;
 }
 
 void

@@ -19,13 +19,16 @@ main(int argc, char **argv) {
     graph_t *G = read_graph(filename);
     print_graph(G);
 
-    search_tree *dfs_tree = dfs(G);
+    search_tree_t *dfs_tree = dfs(G);
     fprintf(stderr, "DFS:\n");
     print_search_tree(dfs_tree);
 
-    search_tree *bfs_tree = bfs(G);
+    search_tree_t *bfs_tree = bfs(G);
     fprintf(stderr, "BFS:\n");
     print_search_tree(bfs_tree);
+
+    dist_tree_t *dij_tree = dijkstra(G, 0);
+    print_dist_tree(dij_tree);
 
     // queue and priority queue testing
     /*
