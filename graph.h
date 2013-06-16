@@ -50,7 +50,7 @@ graph_t *create_empty_graph(int n, int directed);
 
 // PRINTING
 void print_graph(graph_t *G);
-void print_dfs(search_tree *D);
+void print_search_tree(search_tree *D);
 
 // SEARCHING    TODO pass function pointer to act on each visited node
 search_tree *dfs(graph_t *G);

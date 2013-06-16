@@ -17,6 +17,7 @@ search_tree *create_empty_search_tree(int n);
 void explore(graph_t *G, search_tree *D, int u);
 search_tree *dfs_rec(graph_t *G);
 search_tree *dfs_iter(graph_t *G);
+int *get_vertex_array(int n);
 
 /* input file must have format:
 
@@ -238,16 +239,68 @@ create_empty_search_tree(int n) {
     return D;
 }
 
+// TODO
 search_tree *
 bfs(graph_t *G) {
     search_tree *D = create_empty_search_tree(G->n);
-    
-    return create_empty_search_tree(G->n);
+    queue_t *Q = create_empty_queue();
+
+    // create array of vertex ints since queue stores (void *) pointers
+    int *vertices = get_vertex_array(G->n);
+
+    int u;  // active vertex
+    int v;  // neighboring vertex
+    edge_t *e;
+
+    int i;
+    for (i = 0; i < G->n; i++) {
+        if (D->arrival_times[i] == UNDEFINED) {
+            // push root node i onto queue and start bfs
+            q_push(Q, (void *) &vertices[i]);
+            D->arrival_times[i] = D->arrival_counter;
+            D->arrival_counter++;
+            D->k++;
+
+            while (q_not_empty(Q)) {
+                u = *( (int *) q_pop(Q) );
+                e = G->edgelists[u].head;
+                while (NULL != e) {
+                    v = e->v;
+                    if (D->arrival_times[v] == UNDEFINED) {
+                        D->arrival_times[v] = D->arrival_counter;
+                        D->arrival_counter++;
+                        D->parents[v] = u;
+                        insert_edge(D->T, e->u, e->v, e->w);
+                        q_push(Q, (void *) &vertices[v]);
+                    }
+                    e = e->next;
+                }
+            }
+        }
+    }
+
+    return D;
 }
 
+// return array {0, 1, ..., n-1}
+int *
+get_vertex_array(int n) {
+    int *vertices = (int *) malloc(sizeof(int) * n);
+    if (NULL == vertices) {
+        fprintf(stderr, "Error: malloc failed\n");
+        exit(EXIT_FAILURE);
+    }
+    int i;
+    for (i = 0; i < n; i++) {
+        vertices[i] = i;    
+    }
+
+    return vertices;
+}
+
+// TODO
 int *
 dijkstra(graph_t *G, int s) {
-    // TODO
     pq_t *Q = create_empty_pq(G->n);
 
     // TODO: is there a better way of passing vertices to Q?
@@ -272,6 +325,12 @@ print_graph(graph_t *G) {
     edge_t *e;
     fprintf(stderr, "GRAPH PRINTOUT:\n");
     fprintf(stderr, "n = %d\n", G->n);
+    if (G->directed) {
+        fprintf(stderr, "(directed)\n");
+    } else {
+        fprintf(stderr, "(undirected)\n");
+    }
+
     for (i = 0; i < G->n; i++) {
         fprintf(stderr, "%d:  ", i);
 
@@ -287,10 +346,10 @@ print_graph(graph_t *G) {
 }
 
 void
-print_dfs(search_tree *D) {
+print_search_tree(search_tree *D) {
     int i;
     edge_t *e;
-    fprintf(stderr, "DEPTH-FIRST SEARCH PRINTOUT:\n");
+    fprintf(stderr, "SEARCH PRINTOUT:\n");
     fprintf(stderr, "k = %d\n", D->k);
 
     for (i = 0; i < D->T->n; i++) {
@@ -301,7 +360,7 @@ print_dfs(search_tree *D) {
         } else {
             fprintf(stderr, "parent = %d, ", D->parents[i]);
         }
-        fprintf(stderr, "dfi = %d\n", D->arrival_times[i]);
+        fprintf(stderr, "arrival time = %d\n", D->arrival_times[i]);
     }
     fprintf(stderr, "\n");
 

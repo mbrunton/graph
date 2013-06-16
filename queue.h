@@ -17,4 +17,5 @@ queue_t *create_empty_queue(void);
 void q_push(queue_t *Q, void *data);
 void *q_pop(queue_t *Q);
 void *q_peek(queue_t *Q);
+int q_not_empty(queue_t *Q);
 void print_queue(queue_t *Q);

@@ -75,6 +75,11 @@ q_peek(queue_t *Q) {
     return Q->head->data;
 }
 
+int
+q_not_empty(queue_t *Q) {
+    return Q->size != 0;
+}
+
 // TODO: this is just for debugging purposes (I know data will be an int *)
 // is there a way to pass to this function what type void * points to?
 void
