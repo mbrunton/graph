@@ -24,9 +24,10 @@ typedef struct {
     entry_t *entries;   // array of entry_t
 } pq_t;
 
+// TODO: shouldn't have to supply length.. make a variable array
 pq_t *create_empty_pq(int length);
-void push(pq_t *Q, void *data, int priority);
+void pq_push(pq_t *Q, void *data, int priority);
 void update_priority(pq_t *Q, void *data, int priority);
-void *pop(pq_t *Q);
-void *peek(pq_t *Q);
+void *pq_pop(pq_t *Q);
+void *pq_peek(pq_t *Q);
 void print_pq(pq_t *Q);

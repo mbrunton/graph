@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <limits.h>
 #include "graph.h"
+#include "priority_queue.h"
+#include "queue.h"
 
 
 // AUXILIARY FUNCTIONS
@@ -239,6 +241,13 @@ create_empty_search_tree(int n) {
 search_tree *
 bfs(graph_t *G) {
     search_tree *D = create_empty_search_tree(G->n);
+    
+    return create_empty_search_tree(G->n);
+}
+
+int *
+dijkstra(graph_t *G, int s) {
+    // TODO
     pq_t *Q = create_empty_pq(G->n);
 
     // TODO: is there a better way of passing vertices to Q?
@@ -249,17 +258,10 @@ bfs(graph_t *G) {
         vertices[i] = i;
     }
 
-    push(Q, &vertices[0], 0);
+    pq_push(Q, &vertices[0], 0);
     for (i = 1; i < G->n; i++) {
-        push(Q, &vertices[i], INFINITY);
+        pq_push(Q, &vertices[i], INFINITY);
     }
-    
-    return create_empty_search_tree(G->n);
-}
-
-int
-dijkstra(graph_t *G, int s) {
-    // TODO
     return 0;
 }
 

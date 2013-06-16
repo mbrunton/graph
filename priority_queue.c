@@ -24,7 +24,7 @@ create_empty_pq(int length) {
 }
 
 void
-push(pq_t *Q, void *data, int priority) {
+pq_push(pq_t *Q, void *data, int priority) {
     if (Q->size >= Q->capacity) {
         fprintf(stderr, "Error: priority queue is full\n");
         fprintf(stderr, "file: %s\tline: %d\n", __FILE__, __LINE__);
@@ -64,7 +64,7 @@ update_priority(pq_t *Q, void *data, int priority) {
 }
 
 void *
-pop(pq_t *Q) {
+pq_pop(pq_t *Q) {
     if (Q->size <= 0) {
         fprintf(stderr, "Error: priority queue is empty\n");
         fprintf(stderr, "file: %s\tline:%d\n", __FILE__, __LINE__);
@@ -124,6 +124,17 @@ pop(pq_t *Q) {
     }
 
     return top;
+}
+
+void *
+pq_peek(pq_t *Q) {
+    if (Q->size <= 0) {
+        fprintf(stderr, "Error: priority queue is empty\n");
+        fprintf(stderr, "file: %s\tline:%d\n", __FILE__, __LINE__);
+        exit(EXIT_FAILURE);
+    }
+
+    return Q->entries[0].data;
 }
 
 void
